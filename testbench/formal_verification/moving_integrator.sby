@@ -1,0 +1,20 @@
+[tasks]
+bmc
+prove
+
+[options]
+depth 36
+bmc: mode bmc
+prove: mode prove
+
+[engines]
+bmc: smtbmc z3
+prove: smtbmc z3
+
+[script]
+ghdl --std=08 moving_integrator.vhd moving_integrator_formal.psl -e moving_integrator
+prep -top MOVING_INTEGRATOR
+
+[files]
+./../moving_integrator.vhd
+moving_integrator_formal.psl

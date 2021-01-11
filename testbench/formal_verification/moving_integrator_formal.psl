@@ -1,0 +1,25 @@
+vunit psl_moving_integrator (MOVING_INTEGRATOR(MOVING_INTEGRATOR_BEHAVE)) {
+
+  -- All is sensitive to rising edge of clk
+  default clock is rising_edge(i_clk);  
+
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Reset output check
+  ----------------------------------------------------------------------------------------------------------------------
+  output_reset: assert always (i_rst) -> next(o_data = (o_data'range=>'0'));
+
+  ----------------------------------------------------------------------------------------------------------------------
+  -- check data stability when clock enable is low
+  ----------------------------------------------------------------------------------------------------------------------
+  clock_enable_check: if G_ROUND_EVEN generate 
+  	output_stable:  assert always (not(i_rst) and not(i_en)) -> next(next(stable(o_data)) until (i_rst or i_en)); 
+  	reset_condition:assert always {i_rst[*32]; i_data = (i_data'range =>'0')} |=> {true; o_data = (o_data'range =>'0')};
+  else generate
+  	output_stable:   assert always (not(i_rst) and not(i_en)) -> next(stable(o_data));
+  	  ----------------------------------------------------------------------------------------------------------------------
+  -- check reset device conditions
+  ----------------------------------------------------------------------------------------------------------------------
+  	reset_condition: assert always {i_rst[*32]; i_data = (i_data'range =>'0')} |=> {o_data = (o_data'range =>'0')}; 
+  end generate clock_enable_check;
+
+}
